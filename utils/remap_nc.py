@@ -6,7 +6,7 @@ import pandas as pd
 import xarray as xr
 
 
-def batch_aggregate_to_adm3_matrix(input_dir, mapping_csv_path):
+def batch_aggregate_to_adm3_matrix(input_dir, mapping_csv_path, input_file=None):
     # 1. Load mapping
     mapping = pd.read_csv(mapping_csv_path)
     mapping = mapping.rename(columns={'latitude': 'lat', 'longitude': 'lon'})
@@ -21,7 +21,10 @@ def batch_aggregate_to_adm3_matrix(input_dir, mapping_csv_path):
     weight_sum_per_adm3 = weights_matrix.sum(dim='pixel')  # shape: (adm3_name,)
 
     # 3. Process Files
-    nc_files = [f for f in glob.glob(os.path.join(input_dir, "*.nc")) if not f.endswith("_adm3.nc")]
+    if input_file is not None:
+        nc_files = [input_file]
+    else:
+        nc_files = [f for f in glob.glob(os.path.join(input_dir, "*.nc")) if not f.endswith("_adm3.nc")]
 
     if not nc_files:
         print("No new .nc files found to process.")
@@ -102,12 +105,19 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--input_dir",
+        required=True,
         help="Directory containing input .nc files to process.",
     )
     parser.add_argument(
         "--weight_file",
+        required=True,
         help="Path to the CSV mapping file (columns: lat, lon, adm3_name, weight).",
+    )
+    parser.add_argument(
+        "--input_file",
+        default=None,
+        help="Optional single .nc file to process instead of all files in input_dir.",
     )
     args = parser.parse_args()
 
-    batch_aggregate_to_adm3_matrix(args.input_dir, args.weight_file)
+    batch_aggregate_to_adm3_matrix(args.input_dir, args.weight_file, input_file=args.input_file)
