@@ -360,23 +360,23 @@ def main():
     TOTAL = 8
 
     steps = [
-        (1, "Process aifs nc files", [
+        (1, "Build climatology", [
+            sys.executable,
+            "python/pipelines/prepare_data/2_build_climatology.py",
+            "--spec_id", clim_spec,
+        ], None),
+
+        (2, "Process aifs nc files", [
             sys.executable,
             "python/pipelines/prepare_data/1_process_raw_nc_files.py",
             "--spec_id", aifs_spec,
         ], aifs_pkl),
 
-        (2, "Process aifs_ens nc files", [
+        (3, "Process aifs_ens nc files", [
             sys.executable,
             "python/pipelines/prepare_data/1_process_raw_nc_files.py",
             "--spec_id", aifs_ens_spec,
         ], aifs_ens_pkl),
-
-        (3, "Build climatology", [
-            sys.executable,
-            "python/pipelines/prepare_data/2_build_climatology.py",
-            "--spec_id", clim_spec,
-        ], None),
 
         (4, "Combine datasets", [
             sys.executable,
