@@ -1,41 +1,85 @@
-import pandas as pd
+import argparse
+import os
+import sys
+
 import matplotlib.pyplot as plt
 import numpy as np
-import os
+import pandas as pd
 
 REPO_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if REPO_ROOT not in sys.path:
     sys.path.insert(0, REPO_ROOT)
 os.chdir(REPO_ROOT)
 
+# ── 0. Parse arguments ────────────────────────────────────────────────────────
+parser = argparse.ArgumentParser(description="Plot AUC by forecast week.")
+parser.add_argument(
+    "--case",
+    default="dry_spell_aifs_gencast_box6",
+    help="Case sub-directory name (default: dry_spell_aifs_gencast_box6)",
+)
+parser.add_argument(
+    "--dir_in",
+    default="Monsoon_Data/results/",
+    help="Root input directory (default: Monsoon_Data/results/)",
+)
+parser.add_argument(
+    "--data_in",
+    default="summary_models_pooled_clim_mok_date_2000_2022.csv",
+    help="CSV filename inside <dir_in>/<case>/ (default: summary_models_pooled_clim_mok_date_2000_2022.csv)",
+)
+parser.add_argument(
+    "--input_file",
+    default=None,
+    help="Full path to input CSV. If given, overrides --dir_in and --data_in.",
+)
+parser.add_argument(
+    "--dir_out",
+    default="benchmark/figure/",
+    help="Output directory for figures (default: benchmark/figure/)",
+)
+parser.add_argument(
+    "--model",
+    default="ngcm",
+    help="Model prefix used in CSV key, e.g. 'ngcm', 'gencast', 'aifs_ens' (default: ngcm)",
+)
+args = parser.parse_args()
+
+# ── Model prefix → display label mapping ─────────────────────────────────────
+MODEL_LABELS = {
+    "ngcm":    "NGCM",
+    "gencast": "GenCast",
+    "aifs_ens": "AIFS_ENS",
+}
+model_prefix = args.model.lower()
+model_key    = f"{model_prefix}_clim_mok_date_raw"
+model_label  = MODEL_LABELS.get(model_prefix, model_prefix.upper())
+
+case   = args.case
+dir_out = args.dir_out
+
 # ── 1. Load data ──────────────────────────────────────────────────────────────
-#case = "wet_spell_aifs_gencast"
-#case = "wet_spell_aifs_aifs_ens"
-case = "dry_spell_aifs_gencast_box6"
-dir_in = "Monsoon_Data/results/"
-data_in =  "summary_models_pooled_clim_mok_date_2000_2022.csv"
-file_path = os.path.join(dir_in, case, data_in)
+if args.input_file is not None:
+    file_path = args.input_file
+else:
+    file_path = os.path.join(args.dir_in, case, args.data_in)
+
 df = pd.read_csv(file_path)
-
-dir_out = "benchmark/figure/"
 os.makedirs(dir_out, exist_ok=True)
-
 
 # ── 2. Models to plot ─────────────────────────────────────────────────────────
 plot_bins   = ["week1", "week2", "week3", "week4"]
 auc_models  = {
-    "unc_clim_raw":           "Unc Clim Raw",
-    "clim_raw":               "Clim Raw",
-    "blended_model":          "Blended Model",
-    "ngcm_clim_mok_date_raw": "GenCast",
-    #"ngcm_clim_mok_date_raw": "AIFS_ENS",
+    "unc_clim_raw":  "Unc Clim Raw",
+    "clim_raw":      "Clim Raw",
+    "blended_model": "Blended Model",
+    model_key:       model_label,
 }
 colors = {
     "Unc Clim Raw":  "#8172B2",
     "Clim Raw":      "#4C72B0",
     "Blended Model": "#DD8452",
-    "GenCast":       "#55A868",
-    #"AIFS_ENS":       "#55A868",
+    model_label:     "#55A868",
 }
 
 # ── 3. Bar plot ───────────────────────────────────────────────────────────────
@@ -71,7 +115,6 @@ ymin = min(df[df["model"].isin(auc_models)][f"auc_{b}"].min() for b in plot_bins
 ax.set_ylim(bottom=max(0, ymin))
 
 plt.tight_layout()
-#plt.savefig("auc_weekly_barplot.png", dpi=150, bbox_inches="tight")
 fout = os.path.join(dir_out, f"auc_barplot_{case}.png")
 plt.savefig(fout, dpi=150, bbox_inches="tight")
 plt.show()

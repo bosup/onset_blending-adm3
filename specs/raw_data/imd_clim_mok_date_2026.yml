@@ -44,7 +44,7 @@ options:
     dry_spell:
       mode: consecutive_dry      # or: window_sum
       # --- consecutive_dry ---
-      min_dry_days: 7
+      min_dry_days: 5
       dry_day_min_mm: 1.0        # optional, defaults to wet_day_min_mm
 
       # --- window_sum (Moron-Robertson definition) ---
