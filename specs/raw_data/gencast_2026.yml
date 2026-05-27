@@ -25,6 +25,7 @@ input:
   # Folder of NetCDF files
   #nc_folder: "/Users/bodong/Code/project/ROMP/data/gencast"
   nc_folder: "/Users/bodong/Code/project/forecast/gencast"
+
   # Regex used to select files within nc_folder.
   # MUST include a 4-digit year somewhere in the filename for year extraction.
   # Examples matched: "2000.nc", "data_2000.nc"
@@ -69,7 +70,7 @@ options:
     dry_spell:
       mode: consecutive_dry      # or: window_sum
       # --- consecutive_dry ---
-      min_dry_days: 7
+      min_dry_days: 5
       dry_day_min_mm: 1.0        # optional, defaults to wet_day_min_mm
 
       # --- window_sum (Moron-Robertson definition) ---
@@ -78,8 +79,8 @@ options:
       # sum_min_mm: 5.0
 
   # Forecast-only: keep lead days in [min_day, max_day + window - 1]
-  min_day: 0
-  #min_day: 1
+  #min_day: 0
+  min_day: 1
   max_day: 45
 
 

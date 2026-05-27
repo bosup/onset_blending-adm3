@@ -24,7 +24,8 @@ type: "rainfall_forecast"
 input:
   # Folder of NetCDF files
   #nc_folder: "/Users/bodong/Code/project/ROMP/data/AIFS"
-  nc_folder: "/Users/bodong/Code/project/forecast/aifs"
+  #nc_folder: "/Users/bodong/Code/project/forecast/aifs"
+  nc_folder: "/Users/bodong/Code/project/forecast/aifs_v2"
 
   # Regex used to select files within nc_folder.
   # MUST include a 4-digit year somewhere in the filename for year extraction.
@@ -32,6 +33,7 @@ input:
   #file_regex: ".*\\b(19|20)\\d{2}\\b.*\\.nc$"
   #file_regex: ".*2026.*_adm3\\.nc$"
   file_regex: '^2026.*_adm3\.nc$'
+  #file_regex: '.*\b(19|20)\d{2}\b.*_adm3\.nc$'
 
   # Main NetCDF variable to read (verify against the NetCDF file structure)
   value_col: "tp"                 
@@ -68,7 +70,7 @@ options:
     dry_spell:
       mode: consecutive_dry      # or: window_sum
       # --- consecutive_dry ---
-      min_dry_days: 7
+      min_dry_days: 5
       dry_day_min_mm: 1.0        # optional, defaults to wet_day_min_mm
 
       # --- window_sum (Moron-Robertson definition) ---
@@ -78,8 +80,8 @@ options:
       
 
   # Forecast-only: keep lead days in [min_day, max_day + window - 1]
-  min_day: 0
-  #min_day: 1
+  #min_day: 0
+  min_day: 1
   max_day: 45
 
 

@@ -105,7 +105,8 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         "--input_dir",
-        required=True,
+        #required=True,
+        default=None,
         help="Directory containing input .nc files to process.",
     )
     parser.add_argument(

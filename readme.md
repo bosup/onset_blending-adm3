@@ -1,10 +1,8 @@
-# Replication Package: Designing probabilistic AI monsoon forecasts to inform agricultural decision-making
+#  Blending (AI + Climatology) model for probabilistic rainy season onset forecasts
 
-Replication code for probabilistic Indian monsoon onset forecasts that blend rainfall observations (IMD) with AI weather prediction model forecasts (NeuralGCM, AIFS) through multinomial blending models. This package reproduces all results from data preparation through cross-validated evaluation to publication figures.
+Package for probabilistic rainy season onset forecasts that blend rainfall observations with AI weather prediction model forecasts (NeuralGCM, AIFS, GenCast) through multinomial blending models. This package reproduces all results from data preparation through cross-validated evaluation to realtime operational forecast. 
 
-The data used in the original paper can be found at https://doi.org/10.5281/zenodo.18894299. Before running this pipeline, all three folders found in this dataset need to be added to `Monsoon_Data/raw_nc`.
-
-> **Note:** This is the Python port of the original R pipeline. All pipeline logic, spec files, and output formats are equivalent to the R version, but all scripts are now `.py` files run with Python 3.10+.
+> **Note:** TThis package is an administrative district blending version of the orginal lat/lon gridded [blending code] (git@github.com:bosup/onset_blending.git)
 
 ---
 
@@ -14,10 +12,10 @@ All pipeline behaviour is controlled by YAML spec files. You can point the pipel
 
 - **Different ground truth rainfall**: Create a new spec in `specs/raw_data/` modelled after `imd_clim_mok_date.yml`. Point `input.nc_folder` at your NetCDF files and configure the variable name, dimension mappings, and onset thresholds for your grid.
 - **Different AI forecast models**: Create a new spec in `specs/raw_data/` modelled after `ngcm.yml` (for ensembles) or `aifs.yml`. The pipeline handles ensemble forecasts in NetCDF format with configurable dimension names and variable mappings. The `name` field under `forecast_models` in the connect spec controls all downstream column names and formula terms — changing it there propagates everywhere automatically.
-- **Different grid resolutions**: Set `cell_transform_enabled: true` in your raw data spec and provide a weights file mapping source grid cells to target grid cells.
+- **Different grid resolutions**: Not being used in the current version.
 - **Different onset definitions**: Edit `options.onset_definition` in your raw data spec (see [Onset Definition](#onset-definition) below). All numerical parameters — trigger window, wet-day threshold, accumulation threshold, follow-up period, and dry-spell check — are fully configurable from the yml. No code changes needed.
 - **Different blending model formulas**: Edit `models.formulas` in `specs/2025_blend/cv_models*.yml`. Formula terms use `_qx` as a shorthand that expands to `_week1` through `_week4` at runtime.
-- **Different forecast systems in the MME**: Edit `mme.blend_models` in `specs/2025_blend/cv_models*.yml`.
+- **Different forecast systems in the MME**: Not being used in the current version. Edit `mme.blend_models` in `specs/2025_blend/cv_models*.yml`.
 - **Different rain predictors**: Edit `rain_predictors` under each model in `specs/2025_blend/connect_*.yml`. Supports both legacy string format (`diff_5day`) and new dict format (`{ agg: diff, window: 5 }`). The dict format is preferred as it generalises to any window size without code changes.
 
 If you add new input sources, you will need to create matching `combine` and `2025_blend` spec files so they are included in the combined dataset and blending pipeline.
