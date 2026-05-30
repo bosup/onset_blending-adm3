@@ -26,6 +26,8 @@ Usage (run from repo root)
     python predict/run_operational_pipeline.py \\
         --year            2026 \\
         --issue_date      2026-06-09 \\
+        --model_single    aifs \\
+        --model_ens       aifs_ens \\
         --aifs_spec       aifs_2026 \\
         --aifs_ens_spec   aifs_ens_2026 \\
         --clim_spec       imd_clim_mok_date_2026 \\
@@ -34,12 +36,12 @@ Usage (run from repo root)
         --blend_spec      cv_models_clim_mok_date_2026 \\
         --coef_dir        Monsoon_Data/results/wet_spell_aifs_aifs_ens \\
         --coef_tag        clim_mok_date_2022_year2022 \\
-        --blend_input     Monsoon_Data/Processed_Data/2026/cv_data_clim_mok_date_new_pipeline_2026.pkl \\
         --work_dir        Monsoon_Data/Processed_Data/2026 \\
         [--aifs_nc_file       /path/to/aifs/2026.nc] \
         [--aifs_ens_nc_file   /path/to/aifs_ens/2026.nc] \
         [--aifs_nc_folder     /path/to/aifs/nc/files] \\
         [--aifs_ens_nc_folder /path/to/aifs_ens/nc/files] \\
+        [--blend_input     Monsoon_Data/Processed_Data/2026/cv_data_clim_mok_date_new_pipeline_2026.pkl] \\
         [--gt_path            Monsoon_Data/Processed_Data/Models/wet_spell/imd_clim_mok_date_wide.pkl] \\
         [--map_output_path    predict/output/2026/] \\
         [--skip_to STEP] \\
@@ -237,10 +239,16 @@ def main():
                         help="Directory containing the blending model coef pkl")
     parser.add_argument("--coef_tag",      required=True,
                         help="Coef tag passed to apply_blend_model --coef_tag")
-    parser.add_argument("--blend_input",   required=True,
-                        help="Path to the wide pipeline pkl for apply_blend_model --input_path")
+    #parser.add_argument("--blend_input",   required=True,
+    #                    help="Path to the wide pipeline pkl for apply_blend_model --input_path")
     parser.add_argument("--work_dir",      required=True,
                         help="Working output directory for intermediate and final files")
+    parser.add_argument("--model_single", required=True,
+                    help="Name of the single deterministic forecast model, e.g. 'aifs'. "
+                         "Overrides 'aifs' key in combine, connect, and cv_models specs.")
+    parser.add_argument("--model_ens",    required=True,
+                    help="Name of the ensemble forecast model, e.g. 'aifs_ens'. "
+                         "Overrides 'aifs_ens' key in combine, connect, and cv_models specs.")
 
     # ── yml field overrides ───────────────────────────────────────────────
     parser.add_argument("--aifs_nc_folder", default=None,
@@ -259,6 +267,9 @@ def main():
                         help="Path to historical ground truth wide pkl. Overrides "
                              "input.gt_path in the clim spec AND ground_truth_wide_rds "
                              "in the combine spec (both must point to the same file)")
+    parser.add_argument("--blend_input", default=None,
+                    help="Path to the wide pipeline pkl for apply_blend_model --input_path. "
+                         "Defaults to <work_dir>/cv_data_clim_mok_date_new_pipeline_<year>.pkl")
 
     # ── Optional ─────────────────────────────────────────────────────────
     parser.add_argument("--map_output_path", default=None,
@@ -279,11 +290,11 @@ def main():
     year       = args.year
     issue_date = args.issue_date
     work_dir   = args.work_dir
-    map_out    = args.map_output_path or os.path.join("predict", "output", year)
+    #map_out    = args.map_output_path or os.path.join("predict", "output", year)
     date_compact = issue_date.replace("-", "")
 
     os.makedirs(work_dir, exist_ok=True)
-    os.makedirs(map_out,  exist_ok=True)
+    #os.makedirs(map_out,  exist_ok=True)
 
     # ── Patch specs where overrides are provided ──────────────────────────
     aifs_spec     = args.aifs_spec
@@ -297,14 +308,16 @@ def main():
             args.aifs_spec, "raw_data",
             [("input.nc_folder",   os.path.dirname(nc_file)),
              ("input.file_regex",  f"^{re.escape(os.path.basename(nc_file))}$"),
-             ("output.basename",   args.aifs_spec)]
+             ("output.basename",   args.aifs_spec),
+             ("output.out_dir",    work_dir),]
         )
         _temp_spec_files.append(os.path.join(work_dir, f"{args.aifs_spec}_op_wide.pkl"))
     elif args.aifs_nc_folder:
         aifs_spec = write_patched_spec(
             args.aifs_spec, "raw_data",
             [("input.nc_folder",   args.aifs_nc_folder),
-             ("output.basename",   args.aifs_spec)]
+             ("output.basename",   args.aifs_spec),
+             ("output.out_dir",    work_dir),]
         )
         _temp_spec_files.append(os.path.join(work_dir, f"{args.aifs_spec}_op_wide.pkl"))
 
@@ -314,14 +327,16 @@ def main():
             args.aifs_ens_spec, "raw_data",
             [("input.nc_folder",   os.path.dirname(nc_file)),
              ("input.file_regex",  f"^{re.escape(os.path.basename(nc_file))}$"),
-             ("output.basename",   args.aifs_ens_spec)]
+             ("output.basename",   args.aifs_ens_spec),
+             ("output.out_dir",    work_dir),]
         )
         _temp_spec_files.append(os.path.join(work_dir, f"{args.aifs_ens_spec}_op_wide.pkl"))
     elif args.aifs_ens_nc_folder:
         aifs_ens_spec = write_patched_spec(
             args.aifs_ens_spec, "raw_data",
             [("input.nc_folder",   args.aifs_ens_nc_folder),
-             ("output.basename",   args.aifs_ens_spec)]
+             ("output.basename",   args.aifs_ens_spec),
+             ("output.out_dir",    work_dir),]
         )
         _temp_spec_files.append(os.path.join(work_dir, f"{args.aifs_ens_spec}_op_wide.pkl"))
 
@@ -329,31 +344,162 @@ def main():
         clim_spec = write_patched_spec(
             args.clim_spec, "raw_data",
             [("input.gt_path",          args.gt_path),
-             ("output.basename",        args.clim_spec)]
+             ("output.basename",        args.clim_spec),
+             ("paths.climatology_out_dir", work_dir),]
         )
-        combine_spec = write_patched_spec(
-            args.combine_spec, "combine",
-            [("ground_truth_wide_rds",  args.gt_path),
-             ("output.basename",        args.combine_spec)]
-        )
-        _temp_spec_files.append(os.path.join(work_dir, f"{args.combine_spec}_op_combined_wide.pkl"))
+#        combine_spec = write_patched_spec(
+#            args.combine_spec, "combine",
+#            [("ground_truth_wide_rds",  args.gt_path),
+#             ("output.basename",        args.combine_spec)]
+#        )
+#        _temp_spec_files.append(os.path.join(work_dir, f"{args.combine_spec}_op_combined_wide.pkl"))
 
 
+    # ---------------------------------------------------------------------
+    # patch combine spec
+    # Read clim spec for climatology output filenames (always, not just when gt_path set)
+    aifs_pkl     = os.path.join(work_dir, f"aifs_{year}_wide.pkl")
+    aifs_ens_pkl = os.path.join(work_dir, f"aifs_ens_{year}_wide.pkl")
+
+    clim_spec_path = os.path.join("specs", "raw_data", f"{args.clim_spec}.yml")
+    with open(clim_spec_path) as f:
+        clim_spec_raw = yaml.safe_load(f)
+    clim_rds     = os.path.join(work_dir, clim_spec_raw["climatologies"]["clim"]["out_stem"]     + ".pkl")
+    clim_unc_rds = os.path.join(work_dir, clim_spec_raw["climatologies"]["clim_unc"]["out_stem"] + ".pkl")
+
+    # Patch combine_spec with work_dir paths (always)
+    combine_spec_path = os.path.join("specs", "combine", f"{combine_spec}.yml")
+    with open(combine_spec_path) as f:
+        cs = yaml.safe_load(f)
+    cs["output"]["out_dir"]                           = work_dir
+    cs["input"]["climatologies"]["clim"]["rds"]       = clim_rds
+    cs["input"]["climatologies"]["clim_unc"]["rds"]   = clim_unc_rds
+    cs["forecasts"]["aifs_ens"]["sources"][0]["file"] = aifs_ens_pkl
+    cs["forecasts"]["aifs"]["sources"][0]["file"]     = aifs_pkl
+
+    # rename forecast keys if model names differ from defaults
+    if args.model_single != "aifs":
+        cs["forecasts"][args.model_single] = cs["forecasts"].pop("aifs")
+    if args.model_ens != "aifs_ens":
+        cs["forecasts"][args.model_ens] = cs["forecasts"].pop("aifs_ens")
+
+    cs["output"]["basename"] = args.combine_spec   # pins output filename to original name
+    if args.gt_path:
+        cs["ground_truth_wide_rds"] = args.gt_path
+    combine_spec_op      = f"{args.combine_spec}_op"
+    combine_spec_op_path = os.path.join("specs", "combine", f"{combine_spec_op}.yml")
+    with open(combine_spec_op_path, "w") as f:
+        yaml.dump(cs, f, default_flow_style=False, allow_unicode=True)
+    _temp_spec_files.append(combine_spec_op_path)
+    #_temp_spec_files.append(os.path.join(work_dir, f"{args.combine_spec}_op_combined_wide.pkl"))
+    combine_spec = combine_spec_op
+    log(f"Patched spec written: {combine_spec_op_path}")
+
+
+    # ---------------------------------------------------------------------
+    # patch connect spec
     # Patch connect_spec input_rds to match the _op combine output basename.
     # write_patched_spec appends _op to combine_spec, so the combine output is
     # named <combine_spec>_op_combined_wide.pkl — the connect spec must match.
     #combine_basename = f"{combine_spec}_combined_wide.pkl"
+
+#    # NEW — reads output.out_dir from the combine spec itself, so subdirs like dry_spell_strict/ are respected
+#    def _read_combine_out_dir(spec_id):
+#        """Return output.out_dir from specs/combine/<spec_id>.yml, falling back to work_dir."""
+#        path = os.path.join("specs", "combine", f"{spec_id}.yml")
+#        if os.path.exists(path):
+#            with open(path) as f:
+#                spec = yaml.safe_load(f)
+#            return spec.get("output", {}).get("out_dir", work_dir)
+#        return work_dir
+#    
+#    # Use the base (un-patched) combine_spec to find where 3_combine_datasets.py will write
+#    combine_out_dir   = _read_combine_out_dir(args.combine_spec)
+#    combine_basename  = f"{args.combine_spec}_combined_wide.pkl"
+#    connect_input_rds = os.path.join(combine_out_dir, combine_basename)
+#    connect_spec = write_patched_spec(
+#        args.connect_spec, "2025_blend",
+#        [("input_rds", connect_input_rds)]
+#    )
+
+    # replace write_patched_spec with a manual read/mutate/write (same pattern as combine) 
+    connect_spec_path = os.path.join("specs", "2025_blend", f"{args.connect_spec}.yml")
     combine_basename = f"{args.combine_spec}_combined_wide.pkl"
     connect_input_rds = os.path.join(work_dir, combine_basename)
-    connect_spec = write_patched_spec(
-        args.connect_spec, "2025_blend",
-        [("input_rds", connect_input_rds)]
-    )
+    connect_output_rds = os.path.join(work_dir, f"cv_data_clim_mok_date_new_pipeline_{year}.pkl")
+    if args.blend_input:
+        connect_output_rds = args.blend_input   # honour explicit override
+    #connect_spec = write_patched_spec(
+    #    args.connect_spec, "2025_blend",
+    #    [("input_rds", connect_input_rds),
+    #     ("output_rds", connect_output_rds),]
+    #)
+
+    with open(connect_spec_path) as f:
+        cs_connect = yaml.safe_load(f)
+    
+    cs_connect["input_rds"]  = connect_input_rds
+    cs_connect["output_rds"] = connect_output_rds
+    
+    for entry in cs_connect["forecast_models"]:
+        if entry["name"] == "aifs_ens":
+            entry["name"] = args.model_ens
+        elif entry["name"] == "aifs":
+            entry["name"] = args.model_single
+    
+    connect_spec_op      = f"{args.connect_spec}_op"
+    connect_spec_op_path = os.path.join("specs", "2025_blend", f"{connect_spec_op}.yml")
+    with open(connect_spec_op_path, "w") as f:
+        yaml.dump(cs_connect, f, default_flow_style=False, allow_unicode=True)
+    _temp_spec_files.append(connect_spec_op_path)
+    connect_spec = connect_spec_op
+    log(f"Patched spec written: {connect_spec_op_path}")
+
+
+    # ---------------------------------------------------------------------
+    # patch blend spec
+    # blend spec patch, also manual read/mutate/write since we need list mutation and formula string substitution
+    blend_spec_path = os.path.join("specs", "2025_blend", f"{args.blend_spec}.yml")
+    with open(blend_spec_path) as f:
+        cs_blend = yaml.safe_load(f)
+    
+    # rename in mme.blend_models list
+    for entry in cs_blend.get("mme", {}).get("blend_models", []):
+        if entry["name"] == "aifs_ens":
+            entry["name"] = args.model_ens
+        elif entry["name"] == "aifs":
+            entry["name"] = args.model_single
+    
+    # rename in extras.forecasts list
+    for entry in cs_blend.get("extras", {}).get("forecasts", []):
+        if entry["name"] == "aifs_ens":
+            entry["name"] = args.model_ens
+        elif entry["name"] == "aifs":
+            entry["name"] = args.model_single
+    
+    # substitute model names in formula text
+    for model_name, formula in cs_blend["models"]["formulas"].items():
+        if formula.get("enabled"):
+            formula["text"] = (
+                formula["text"]
+                .replace(f"diff_aifs_ens_qx", f"diff_{args.model_ens}_qx")
+                .replace(f"diff_aifs_qx",     f"diff_{args.model_single}_qx")
+            )
+    
+    blend_spec_op      = f"{args.blend_spec}_op"
+    blend_spec_op_path = os.path.join("specs", "2025_blend", f"{blend_spec_op}.yml")
+    with open(blend_spec_op_path, "w") as f:
+        yaml.dump(cs_blend, f, default_flow_style=False, allow_unicode=True)
+    _temp_spec_files.append(blend_spec_op_path)
+    blend_spec = blend_spec_op
+    log(f"Patched spec written: {blend_spec_op_path}")
+
 
     # ── Expected output paths ─────────────────────────────────────────────
-    aifs_pkl     = os.path.join(work_dir, f"aifs_{year}_wide.pkl")
-    aifs_ens_pkl = os.path.join(work_dir, f"aifs_ens_{year}_wide.pkl")
-    connect_pkl  = args.blend_input
+#    aifs_pkl     = os.path.join(work_dir, f"aifs_{year}_wide.pkl")
+#    aifs_ens_pkl = os.path.join(work_dir, f"aifs_ens_{year}_wide.pkl")
+    #connect_pkl  = args.blend_input
+    connect_pkl  = connect_output_rds
     preds_pkl    = os.path.join(work_dir, f"{args.blend_model}_global_year{year}_preds.pkl")
     export_csv   = os.path.join(work_dir, f"blend_output_summary_{date_compact}.csv")
 
@@ -399,7 +545,8 @@ def main():
             "--year",       year,
             "--coef_dir",   args.coef_dir,
             "--coef_tag",   args.coef_tag,
-            "--input_path", args.blend_input,
+            #"--input_path", args.blend_input,
+            "--input_path", connect_pkl,
             "--out_dir",    work_dir,
         ], preds_pkl),
 
@@ -416,7 +563,8 @@ def main():
             sys.executable,
             "predict/run_maps.py",
             "--input_file",  export_csv,
-            "--output_path", map_out,
+            #"--output_path", map_out,
+            "--output_path", work_dir,
             "--region",      args.region,
         ], None),
     ]
@@ -424,7 +572,7 @@ def main():
     # ── Run ───────────────────────────────────────────────────────────────
     log(f"Starting operational pipeline for year={year}, issue_date={issue_date}")
     log(f"Work dir    : {work_dir}")
-    log(f"Map output  : {map_out}")
+    #log(f"Map output  : {map_out}")
     if args.aifs_nc_file:
         log(f"aifs nc_file override        : {args.aifs_nc_file}")
     elif args.aifs_nc_folder:
@@ -458,7 +606,7 @@ def main():
 
     if not args.dry_run:
         log(f"Pipeline complete. Outputs in : {work_dir}")
-        log(f"Maps in                       : {map_out}")
+        #log(f"Maps in                       : {map_out}")
     else:
         log("Dry run complete — no files were created.")
 

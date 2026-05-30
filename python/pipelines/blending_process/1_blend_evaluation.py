@@ -70,6 +70,12 @@ def main():
                         help="Spec file name (without .yml) in specs/2025_blend/")
     parser.add_argument("--cores", type=int, default=None,
                         help="Override number of parallel cores")
+    parser.add_argument("--work_dir", default=None,
+                        help="If provided, input pkl is read directly from this directory, "
+                             "overriding pipeline_input_dir in the spec.")
+    parser.add_argument("--results_dir", default=None,
+                        help="If provided, all outputs are written to this directory, "
+                             "overriding pipeline_output_dir in the spec.")
     args = parser.parse_args()
 
     spec_path = os.path.join("specs", "2025_blend", f"{args.spec_id}.yml")
@@ -77,8 +83,13 @@ def main():
         spec = yaml.safe_load(f)
 
     #path_box = "Monsoon_Data/results/2025_model_evaluation"
-    pipeline_output_dir = spec["run"].get("pipeline_output_dir", "")   # default: no subfolder
-    path_box = os.path.join("Monsoon_Data/results", pipeline_output_dir)
+    #pipeline_output_dir = spec["run"].get("pipeline_output_dir", "")   # default: no subfolder
+    #path_box = os.path.join("Monsoon_Data/results", pipeline_output_dir)
+    if args.results_dir:
+        path_box = args.results_dir
+    else:
+        pipeline_output_dir = spec["run"].get("pipeline_output_dir", "")
+        path_box = os.path.join("Monsoon_Data/results", pipeline_output_dir)
 
     os.makedirs(path_box, exist_ok=True)
 
@@ -103,12 +114,22 @@ def main():
     # Load data
     input_file = input_rds_from_cutoff(cutoff_mode)
     #input_path = os.path.join("Monsoon_Data/Processed_Data/2025_pipeline_input", input_file)
-    pipeline_input_dir = spec["run"].get("pipeline_input_dir", "")   # default: no subfolder
-    input_path = os.path.join(
-        "Monsoon_Data/Processed_Data/pipeline_input",
-        pipeline_input_dir,
-        input_file,
-    )
+    # pipeline_input_dir = spec["run"].get("pipeline_input_dir", "")   # default: no subfolder
+    # input_path = os.path.join(
+    #     "Monsoon_Data/Processed_Data/pipeline_input",
+    #     pipeline_input_dir,
+    #     input_file,
+    # )
+
+    if args.work_dir:
+        input_path = os.path.join(args.work_dir, input_file)
+    else:
+        pipeline_input_dir = spec["run"].get("pipeline_input_dir", "")
+        input_path = os.path.join(
+            "Monsoon_Data/Processed_Data/pipeline_input",
+            pipeline_input_dir,
+            input_file,
+        )
 
     with open(input_path, "rb") as f:
         wide_df = pickle.load(f)

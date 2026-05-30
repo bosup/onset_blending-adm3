@@ -1,197 +1,131 @@
-adm3_name
-Abichugna Gne'a
-Abuna Ginde Beret
-Ada'a
-Adama
-Adama Tulu Jido Kombolcha
-Adama town
-Adda Berga
-Addi Arekay
-Adiss Zemen town
-Alefa
-Aleltu
-Aleme Ketma town
-Amba Giorgis town
-Ambo town
-Amde Work town
-Amigna
-Anchar
-Andabet /West Esite
-Aneded
-Angolelana Tera
-Angot
-Arerti town
-Argoba
-Arsi Negele
-Aseko
-Asela town
-Assagirt
-Awabel
-Aykel town
-Basona Worena
-Bechena town
-Bele Gesgar
-Berbere
-Beyeda
-Bibugn
-Bishoftu town
-Boke
-Bora (OR)
-Borena /Debresina
-Bugna
-Burayu
-Chilga 1
-Chilga 2
-Chole
-Dabat
-Dabat town
-Daro Lebu
-Dawe Ketchen
-Dawunt
-Debark
-Debark town
-Debay Telatgen
-Debre Berhan town
-Debre Libanos
-Debre Markos town
-Debre Tabor town
-Debrework town
-Degeluna Tijo
-Degem
-Degolo town
-Dehana
-Dejen
-Dejen town
-Dendi
-Dera (AM)
-Dera (OR)
-Diksis
-Dodota
-East Belesa
-East Dembia
-East Esite
-Ebenat
-Ebenat town
-Ejere /Addis Alem
-Ejersa Lafo
-Enarj Enawga
-Enebse Sarmder
-Enemay
-Ensaro
-Farta
-Fiche town
-Filakit town
-Fogera
-Galan
-Galan Gudo
-Gaz Gibla
-Gedeb Asasa
-Gefersa Guje
-Gerar Jarso
-Gimbichu
-Ginir
-Ginir town
-Goba Koricha
-Golocha
-Goncha Siso Enebse
-Gondar town
-Gonder Zuria
-Goro (Bale)
-Gumbi Bordede
-Guna
-Guna Begemider
-Habro
-Habru
-Hagere Mariam
-Hamusit town
-Hara town
-Harena Buluk
-Hawi Gudina
-Heban Arsi
-Hidabu Abote
-Hitosa
-Ifata
-Ilu
-Inkolo Wabe
-Jama
-Janamora
-Jeju
-Jeldu
-Jida
-Kelala town
-Kelela
-Kersana Malima
-Kimbibit
-Kinfaz Begela
-Kolla Debba town
-Kura Jida
-Kuyu
-Lalibela town
-Lasta
-Lay Armacho
-Lay Gayint
-Liben Chukala
-Libokemekem
-Lome (OR)
-Lude Hitosa
-Lumame town
-Mana Abichu
-Masero Denb /Central Armacho
-Mehal Sayint
-Mekan Eyesuse
-Mekane Selam town
-Meket
-Mena Meketewa
-Menze Keya Gabriel
-Menze Lalo Midir
-Merhabete
-Mersa town
-Merti
-Merto Lemariyam town
-Meta Robi
-Meta Walkite
-Mida Woremo
-Mojan Wedera
-Mojo town
-Moretna Jiru
-Mota town
-Munessa
-Nefas Mewicha town
-Quarit
-Robe
-Sahila
-Sayint
-Sebeta
-Sedae
-Sede Muja
-Sekota
-Sekota town
-Semada
-Shanan Kolu
-Shawra town
-Shebel Bernta
-Sire
-Siya Debirna Wayu
-Sodo Daci
-Sude
-Sululta
-Tach Armacho
-Tach Gayint
-Takusa
-Tegede
-Telemt
-Tena
-Tiyo
-Tole
-Tulefa town
-Wara Jarso
-Wegde
-Wegeda town
-Wegera
-West Belesa
-West Dembiya
-Worebabu
-Woreta town
-Wuchale
-Yaya Gulele
-Zequala
+adm3_name,adm3_pcode
+Abichugna Gne'a,ET040609
+Adama,ET040703
+Adama Tulu Jido Kombolcha,ET040708
+Agarfa,ET041104
+Akaki,ET042012
+Ambasel,ET030404
+Ambo Zuria,ET040503
+Aneded,ET030617
+Antsokiya,ET030507
+Arsi Negele,ET041703
+Arsi Negele town,ET041799
+Assagirt,ET030514
+Awabel,ET030612
+Bahir Dar town,ET030712
+Bahirdar Zuria,ET030702
+Baso Liben,ET030611
+Basona Worena,ET030519
+Becho (SW Shewa),ET041309
+Bele Gesgar,ET040823
+Berbere,ET041114
+Bibugn,ET030601
+Bora (OR),ET040710
+Boset,ET040702
+Bure (AM),ET030710
+Dawo,ET041304
+Debre Berhan town,ET030520
+Debre Elias,ET030608
+Debre Libanos,ET040607
+Debre Markos town,ET030615
+Debub Achefer,ET030713
+Debub Mecha,ET030715
+Dega Damot,ET030707
+Degeluna Tijo,ET040815
+Degem,ET040605
+Dejen,ET030613
+Dembecha,ET030708
+Dendi,ET040510
+Dera (AM),ET030209
+Dera (OR),ET040602
+Dessie Zuria,ET030409
+Diksis,ET040822
+Dinsho,ET041122
+Dodola,ET041707
+Dodota,ET040805
+Dugda,ET040707
+East Dembia,ET031111
+East Esite,ET030208
+Eferatana Gidem,ET030508
+Ejere /Addis Alem,ET040511
+Ejersa Lafo,ET040590
+Enarj Enawga,ET030605
+Enemay,ET030606
+Ensaro,ET030503
+Finote Selam town,ET030714
+Fogera,ET030203
+Gasera,ET041106
+Gedeb Asasa,ET041706
+Gerar Jarso,ET040606
+Ginir,ET042103
+Goba (OR),ET041110
+Goncha Siso Enebse,ET030603
+Goro (Bale),ET041116
+Guba Lafto,ET030307
+Guzamn,ET030610
+Hagere Mariam,ET030516
+Holeta town,ET042020
+Hulet Ej Enese,ET030602
+Ilu,ET041305
+Jabi Tehnan,ET030709
+Jama,ET030414
+Jeju,ET040804
+Kalu,ET030407
+Kersana Malima,ET041307
+Kewet,ET030512
+Kofele,ET041704
+Kokosa,ET041708
+Kore,ET041705
+Lasta,ET030310
+Lay Armacho,ET031108
+Liben Chukala,ET040711
+Limu Bilbilo,ET040818
+Lome (OR),ET040704
+Lude Hitosa,ET040821
+Mecha,ET030704
+Meket,ET030304
+Menze Gera Midir,ET030505
+Menze Keya Gabriel,ET030521
+Merawi town,ET030797
+Merhabete,ET030502
+Merti,ET040801
+Michakel,ET030609
+Mida Woremo,ET030501
+Minjar Shenkora,ET030518
+Mojan Wedera,ET030511
+Moretna Jiru,ET030504
+Munessa,ET040817
+Nenesebo,ET041709
+Raya Kobo,ET030302
+Robe,ET040812
+Sayint,ET030411
+Sebeta Hawas,ET042006
+Sedae,ET030619
+Seden Sodo,ET041310
+Senan,ET030616
+Sendafa town,ET042018
+Shala,ET041702
+Shashemene town,ET041711
+Shashemene Zuria,ET041712
+Shebel Bernta,ET030614
+Shirka,ET040814
+Sinana,ET041109
+Sire,ET040820
+Siya Debirna Wayu,ET030523
+Sululta,ET042013
+Tarema Ber,ET030510
+Tegede,ET031107
+Thehulederie,ET030405
+Tiyo,ET040816
+Toke Kutaye,ET040517
+Tole,ET041308
+Wadla,ET030305
+Waliso,ET041303
+Wara Jarso,ET040601
+Welmera,ET042014
+Wemberma,ET030711
+Wenchi,ET041302
+West Dembiya,ET031125
+Wondo,ET041797
+Wuchale,ET040608
+Yilmana Densa,ET030703
