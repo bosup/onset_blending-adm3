@@ -340,13 +340,21 @@ def main():
         )
         _temp_spec_files.append(os.path.join(work_dir, f"{args.aifs_ens_spec}_op_wide.pkl"))
 
-    if args.gt_path:
-        clim_spec = write_patched_spec(
-            args.clim_spec, "raw_data",
-            [("input.gt_path",          args.gt_path),
-             ("output.basename",        args.clim_spec),
-             ("paths.climatology_out_dir", work_dir),]
-        )
+    #if args.gt_path:
+    #    clim_spec = write_patched_spec(
+    #        args.clim_spec, "raw_data",
+    #        [("input.gt_path",          args.gt_path),
+    #         ("output.basename",        args.clim_spec),
+    #         ("paths.climatology_out_dir", work_dir),]
+    #    )
+    
+    clim_spec = write_patched_spec(
+        args.clim_spec, "raw_data",
+        [("output.basename",           args.clim_spec),
+         ("paths.climatology_out_dir", work_dir),
+         ("input.gt_path",             args.gt_path or os.path.join(work_dir, f"{args.clim_spec}_wide.pkl")),]
+    )
+
 #        combine_spec = write_patched_spec(
 #            args.combine_spec, "combine",
 #            [("ground_truth_wide_rds",  args.gt_path),
@@ -540,7 +548,8 @@ def main():
         (6, "Apply blend model", [
             sys.executable,
             "predict/apply_blend_model.py",
-            "--spec_id",    args.blend_spec,
+            #"--spec_id",    args.blend_spec,
+            "--spec_id",    blend_spec,
             "--model",      args.blend_model,
             "--year",       year,
             "--coef_dir",   args.coef_dir,
@@ -554,7 +563,8 @@ def main():
             sys.executable,
             "predict/export_blend_output.py",
             "--issue_date", issue_date,
-            "--spec_id",    args.blend_spec,
+            #"--spec_id",    args.blend_spec,
+            "--spec_id",    blend_spec,
             "--preds_file", preds_pkl,
             "--out_dir",    work_dir,
         ], export_csv),
