@@ -50,6 +50,9 @@ MODEL_LABELS = {
     "ngcm":    "NGCM",
     "gencast": "GenCast",
     "aifs_ens": "AIFS_ENS",
+    "aifs_ens_v2": "AIFS_ENS_v2",
+    "aifs": "AIFS",
+    "aifs_v2": "AIFS_v2",
 }
 model_prefix = args.model.lower()
 model_key    = f"{model_prefix}_clim_mok_date_raw"
