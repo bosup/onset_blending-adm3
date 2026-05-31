@@ -24,6 +24,7 @@ import matplotlib
 matplotlib.use('Agg')
 from matplotlib.patches import Patch
 from matplotlib.colors import BoundaryNorm, ListedColormap
+import matplotlib.colors as mcolors
 import geopandas as gpd
 from pathlib import Path
 import logging
@@ -229,15 +230,79 @@ def make_maps(summary, output_path, mok=False, all_cells_file=None,
     plasma_cmap   = plt.get_cmap('Blues_r')
     #plasma_cmap   = plt.get_cmap('cool_r')
     #plasma_cmap   = plt.get_cmap('BuPu_r')
-    stops         = np.linspace(0.2, 1.0, len(period_order))
-    period_colors = {k: plasma_cmap(s) for k, s in zip(period_order, stops)}
+    colors = [
+    '#9ecae1',  # 0.0-0.3
+    '#6baed6',  # 0.3-0.5
+    '#4292c6',  # 0.5-0.6
+    '#2171b5',  # 0.6-0.7
+    '#08519c',  # 0.7-0.8
+    '#08306b',  # 0.8-1.0
+    ]
+
+    colors = [
+    '#dbe9f6',  # 0.0-0.3  (lighter)
+    '#9ecae1',  # 0.3-0.5
+    '#6baed6',  # 0.5-0.6
+    '#4292c6',  # 0.6-0.7
+    '#2171b5',  # 0.7-0.8
+    '#08519c',  # 0.8-1.0
+    ]
+
+    colors = [
+    '#e3eef9',  # 0.0-0.3
+    '#bdd7e7',  # 0.3-0.5
+    '#6baed6',  # 0.5-0.6
+    '#4292c6',  # 0.6-0.7
+    '#2171b5',  # 0.7-0.8
+    '#084594',  # 0.8-1.0
+    ]
+
+    colors = [
+        '#e3eef9',  # 0.0-0.3
+        '#bdd7e7',  # 0.3-0.5
+        '#6baed6',  # 0.5-0.6
+        '#3182bd',  # 0.6-0.7
+        '#08519c',  # 0.7-0.8
+        '#08306b',  # 0.8-1.0
+    ]
+
+#    colors = [
+#    '#e3eef9',  # 0.0-0.3
+#    '#bdd7e7',  # 0.3-0.5
+#    '#6baed6',  # 0.5-0.6
+#    '#2171b5',  # 0.6-0.7
+#    '#08519c',  # 0.7-0.8
+#    '#041f4a',  # 0.8-1.0
+#    ]
+
+#    colors = [
+#    '#e3eef9',  # 0.0-0.3
+#    '#bdd7e7',  # 0.3-0.5
+#    '#6baed6',  # 0.5-0.6
+#    '#2171b5',  # 0.6-0.7
+#    '#00429d',  # 0.7-0.8
+#    '#000033',  # 0.8-1.0
+#    ]
+
+    #plasma_cmap = mcolors.ListedColormap(colors)
+    plasma_cmap = mcolors.ListedColormap(list(reversed(colors)))
+
+    #stops         = np.linspace(0.2, 1.0, len(period_order))
+    #period_colors = {k: plasma_cmap(s) for k, s in zip(period_order, stops)}
+
+    #idx = np.round(np.linspace(0, len(list(reversed(colors)))-1, 4)).astype(int)
+    #idx = [0, 1, 3, 5]
+    idx = [0, 2, 4, 5]
+    selected = [list(reversed(colors))[i] for i in idx]
+    period_colors = {k: c for k, c in zip(period_order, selected)}
     period_colors['none'] = '#d3d3d3'
 
     #prob_bins = [0, 0.1, 0.2, 0.3, 0.4, 1.0]
     #prob_bins = [0, 0.2, 0.4, 0.5, 0.6, 0.7, 0.8, 1.0]
     prob_bins = [0, 0.3, 0.5, 0.6, 0.7, 0.8, 1.0]
     #prob_cmap = ListedColormap(plt.get_cmap('plasma_r')(np.linspace(0, 1, len(prob_bins) - 1)))
-    prob_cmap = ListedColormap(plt.get_cmap('Blues')(np.linspace(0, 1, len(prob_bins) - 1)))
+    #prob_cmap = ListedColormap(plt.get_cmap('Blues')(np.linspace(0, 1, len(prob_bins) - 1)))
+    prob_cmap = ListedColormap(plt.get_cmap('Blues')(np.linspace(0.05, 1, len(prob_bins) - 1)))
     prob_norm = BoundaryNorm(prob_bins, ncolors=len(prob_bins) - 1, clip=True)
 
     def max_period(vf):
